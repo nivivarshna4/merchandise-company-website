@@ -1,0 +1,27 @@
+name: Docker Build and Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build Docker image
+        run: docker build -t merchandise-company-website:latest .
+
+      - name: Run container test
+        run: |
+          docker run -d -p 8080:8080 --name test-app merchandise-company-website:latest
+          sleep 5
+          curl http://localhost:8080/ || exit 1
+          docker stop test-app
